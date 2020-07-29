@@ -1,4 +1,4 @@
-import { initNode2SketchSymbol } from '../src/node2SketchSymbol';
+import { initNode2SketchSymbol } from '../src';
 import { resolve } from 'path';
 
 describe('node2SketchSymbol', function() {

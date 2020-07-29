@@ -1,5 +1,6 @@
 import puppeteer from 'puppeteer';
 import express from 'express';
+import { resolve } from 'path';
 
 const hostname = '127.0.0.1'; //IP地址
 const port = 8973; //端口号
@@ -24,7 +25,10 @@ export const initNode2SketchSymbol = (filePath: string, url: string) => {
       await page.goto(baseURL + url);
       await page.waitFor(3000);
 
-      await page.addScriptTag({ path: '../dist/node2Symbol.bundle.js' });
+      await page.addScriptTag({
+        path: resolve(__dirname, '../dist/node2Symbol.bundle.js'),
+      });
+
       const json = await page.evaluate(
         `node2Symbol.run(${selector}(document))`
       );

@@ -1,6 +1,6 @@
 {
   "name": "html2sketch-browserless",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "Convert any website into sketch json",
   "scripts": {
     "prebuild": "webpack",
