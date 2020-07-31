@@ -10,7 +10,14 @@ const port = 6783; //端口号
 
 const baseURL = `http://${hostname}:${port}`;
 
-export const initNode2SketchSymbol = (filePath: string, url: string) => {
+interface Options {
+  headless: boolean;
+}
+export const initNode2SketchSymbol = (
+  filePath: string,
+  url: string,
+  { headless }: Options = { headless: true }
+) => {
   const app = express();
   const html = fs.readFileSync(filePath + '/index.html', 'utf8');
 
@@ -26,7 +33,7 @@ export const initNode2SketchSymbol = (filePath: string, url: string) => {
   });
 
   return async (selector: (dom) => Element) => {
-    const browser = await puppeteer.launch();
+    const browser = await puppeteer.launch({ headless });
 
     try {
       const page = await browser.newPage();
