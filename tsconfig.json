@@ -2,8 +2,8 @@
   "include": ["src"],
   "exclude": ["node_modules", "src/node2Symbol.ts"],
   "compilerOptions": {
-    "target": "es5",
-    "module": "commonjs",
+    "target": "ES5",
+    "module": "CommonJS",
     "outDir": "./lib",
     "sourceMap": true,
     "declaration": true,

@@ -39,10 +39,9 @@ export const initNode2SketchSymbol = (
       const page = await browser.newPage();
 
       await page.goto(baseURL + url);
-      await page.waitFor(3000);
 
       await page.addScriptTag({
-        path: resolve(__dirname, '../dist/node2Symbol.bundle.js'),
+        path: resolve(__dirname, '../resources/node2Symbol.bundle.js'),
       });
 
       const json = await page.evaluate(
@@ -53,7 +52,7 @@ export const initNode2SketchSymbol = (
       fs.writeFileSync(filePath + '/index.html', html);
       return json;
     } catch (e) {
-      await browser.close();
+      // await browser.close();
       throw e;
     }
   };
