@@ -12,11 +12,12 @@ const baseURL = `http://${hostname}:${port}`;
 
 interface Options {
   headless: boolean;
+  close: boolean;
 }
 export const initNode2SketchSymbol = (
   filePath: string,
   url: string,
-  { headless }: Options = { headless: true }
+  { headless, close }: Options = { headless: true, close: true }
 ) => {
   const app = express();
   const html = fs.readFileSync(filePath + '/index.html', 'utf8');
@@ -39,7 +40,6 @@ export const initNode2SketchSymbol = (
       const page = await browser.newPage();
 
       await page.goto(baseURL + url);
-      await page.waitFor(3000);
 
       await page.addScriptTag({
         path: resolve(__dirname, '../dist/node2Symbol.bundle.js'),
@@ -48,12 +48,16 @@ export const initNode2SketchSymbol = (
       const json = await page.evaluate(
         `node2Symbol.run(${selector}(document))`
       );
-      await browser.close();
+      if (close) {
+        await browser.close();
+      }
 
       fs.writeFileSync(filePath + '/index.html', html);
       return json;
     } catch (e) {
-      await browser.close();
+      if (close) {
+        await browser.close();
+      }
       throw e;
     }
   };
