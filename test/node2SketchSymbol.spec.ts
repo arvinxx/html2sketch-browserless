@@ -1,5 +1,6 @@
 import { initNode2SketchSymbol } from '../lib';
 import { resolve } from 'path';
+import { writeFileSync } from 'fs';
 
 describe('node2SketchSymbol', function() {
   it('should work well', async () => {
@@ -24,6 +25,8 @@ describe('node2SketchSymbol', function() {
       console.log(doc.querySelectorAll('[data-hitu-symbol]'));
       return doc.querySelectorAll('[data-hitu-symbol]');
     });
+
+    writeFileSync('./x.json', JSON.stringify(json));
     expect(json).toBe('1');
   });
 });
