@@ -1,11 +1,11 @@
 {
   "name": "html2sketch-browserless",
-  "version": "0.2.0",
+  "version": "0.1.4",
   "description": "Convert any website into sketch json",
   "scripts": {
     "prebuild": "webpack",
     "build": "tsc",
-    "release": "npm run prebuild && npm run build && npm publish"
+    "release": "npm run build && npm publish"
   },
   "main": "./lib/index.js",
   "repository": "https://github.com/arvinxx/html2sketch-browserless.git",
@@ -34,7 +34,7 @@
   ],
   "dependencies": {
     "express": "^4.17.1",
-    "html2sketch": "^0.1.16",
+    "html2sketch": "^0.1.5",
     "puppeteer": "^5.2.1"
   }
 }

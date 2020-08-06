@@ -1,6 +1,6 @@
 import { initNode2SketchSymbol } from '../lib';
 import { resolve } from 'path';
-import { SymbolMaster } from 'html2sketch';
+import { writeFileSync } from 'fs';
 
 describe('node2SketchSymbol', function() {
   it('should work well', async () => {
@@ -25,24 +25,8 @@ describe('node2SketchSymbol', function() {
       console.log(doc.querySelectorAll('[data-hitu-symbol]'));
       return doc.querySelectorAll('[data-hitu-symbol]');
     });
+
+    writeFileSync('./x.json', JSON.stringify(json));
     expect(json).toBe('1');
-  });
-  it('带 layout 解析', async () => {
-    const node2SketchSymbol = initNode2SketchSymbol(
-      resolve(__dirname, './html/layout'),
-      '/~demos/02af570d',
-      {
-        headless: false,
-        layouts: [],
-      }
-    );
-    const selector = function(document) {
-      return document.getElementsByTagName('button')[0];
-    };
-    const handleSymbol = function(symbol: SymbolMaster) {
-      symbol.name = '213';
-    };
-    const json = await node2SketchSymbol(selector, handleSymbol);
-    expect(json).toBe(result);
   });
 });
