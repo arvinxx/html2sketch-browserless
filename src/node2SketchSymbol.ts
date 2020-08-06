@@ -11,8 +11,8 @@ const port = 6783; //端口号
 const baseURL = `http://${hostname}:${port}`;
 
 interface Options {
-  headless: boolean;
-  close: boolean;
+  headless?: boolean;
+  close?: boolean;
 }
 export const initNode2SketchSymbol = (
   filePath: string,
