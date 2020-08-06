@@ -13,11 +13,16 @@ const baseURL = `http://${hostname}:${port}`;
 interface Options {
   headless?: boolean;
   close?: boolean;
+  noSandbox?: boolean;
 }
 export const initNode2SketchSymbol = (
   filePath: string,
   url: string,
-  { headless, close }: Options = { headless: true, close: true }
+  { headless, close, noSandbox }: Options = {
+    headless: true,
+    close: true,
+    noSandbox: true,
+  }
 ) => {
   const app = express();
   const html = fs.readFileSync(filePath + '/index.html', 'utf8');
@@ -34,7 +39,12 @@ export const initNode2SketchSymbol = (
   });
 
   return async (selector: (dom) => Element) => {
-    const browser = await puppeteer.launch({ headless });
+    const browser = await puppeteer.launch({
+      headless,
+      args: noSandbox
+        ? ['--no-sandbox', '--disable-setuid-sandbox']
+        : undefined,
+    });
 
     try {
       const page = await browser.newPage();
