@@ -1,5 +1,6 @@
 import { initNode2SketchSymbol } from '../src';
 import { resolve } from 'path';
+import { SymbolMaster } from 'html2sketch';
 
 const result = {
   _class: 'symbolMaster',
@@ -430,6 +431,24 @@ describe('node2SketchSymbol', function() {
     const json = await node2SketchSymbol(
       (document) => document.getElementsByTagName('button')[0]
     );
+    expect(json).toBe(result);
+  });
+  it('带 layout 解析', async () => {
+    const node2SketchSymbol = initNode2SketchSymbol(
+      resolve(__dirname, './html/layout'),
+      '/~demos/02af570d',
+      {
+        headless: false,
+        layouts: [],
+      }
+    );
+    const selector = function(document) {
+      return document.getElementsByTagName('button')[0];
+    };
+    const handleSymbol = function(symbol: SymbolMaster) {
+      symbol.name = '213';
+    };
+    const json = await node2SketchSymbol(selector, handleSymbol);
     expect(json).toBe(result);
   });
 });
