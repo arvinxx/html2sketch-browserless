@@ -20,12 +20,11 @@ interface Options {
   headless?: boolean;
   close?: boolean;
   noSandbox?: boolean;
-  motions?: boolean;
 }
 export const initNode2SketchSymbol = (
   filePath: string,
   url: string,
-  { headless = true, close = true, noSandbox = true, motions }: Options = {
+  { headless = true, close = true, noSandbox = true }: Options = {
     headless: true,
     close: true,
     noSandbox: true,
@@ -39,7 +38,11 @@ export const initNode2SketchSymbol = (
 
   fs.writeFileSync(filePath + '/index.html', temp);
 
-  app.use(url, express.static(filePath)); //指定静态文件目录
+  const staticURL = url.split('?')[0];
+
+  const motions = url.split('?')[1]?.includes('capture');
+
+  app.use(staticURL, express.static(filePath)); //指定静态文件目录
 
   app.listen(port, hostname, () => {
     console.log(`启动Express服务在 ${baseURL}`);
@@ -55,7 +58,7 @@ export const initNode2SketchSymbol = (
     const page = await browser.newPage();
 
     try {
-      const resultURL = `${baseURL}${url}${motions ? '?capture' : ''}`;
+      const resultURL = `${baseURL}${url}`;
       console.log('访问的网址为:', resultURL);
       await page.goto(resultURL);
 
@@ -76,25 +79,36 @@ export const initNode2SketchSymbol = (
         });
       `);
 
-      if (!motions && selector) {
-        const json = await page.evaluate(
-          `node2Symbol.run(${selector}(document))`
-        );
+      // 如果有 motions
+      if (motions) {
+        await page.waitFor(1000);
+
+        const json = await page.evaluate(`window.hituSymbolData`);
+
         if (close) {
           await browser.close();
         }
-
         fs.writeFileSync(filePath + '/index.html', html);
         return json;
       }
 
-      await page.waitFor(2000);
+      if (selector) {
+        const json = await page.evaluate(
+          `node2Symbol.run(${selector}(document))`
+        );
 
-      const json = await page.evaluate(`window.hituSymbolData`);
+        if (close) {
+          await browser.close();
+        }
+        fs.writeFileSync(filePath + '/index.html', html);
+        return json;
+      }
+
+      const json = await page.evaluate(`node2Symbol.run()`);
+
       if (close) {
         await browser.close();
       }
-
       fs.writeFileSync(filePath + '/index.html', html);
       return json;
     } catch (e) {
