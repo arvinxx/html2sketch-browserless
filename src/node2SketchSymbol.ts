@@ -10,15 +10,22 @@ const port = 6783; //端口号
 
 const baseURL = `http://${hostname}:${port}`;
 
+declare global {
+  interface Window {
+    hituSelectedNodes: Element[];
+  }
+}
+
 interface Options {
   headless?: boolean;
   close?: boolean;
   noSandbox?: boolean;
+  motions?: boolean;
 }
 export const initNode2SketchSymbol = (
   filePath: string,
   url: string,
-  { headless, close, noSandbox }: Options = {
+  { headless, close, noSandbox, motions }: Options = {
     headless: true,
     close: true,
     noSandbox: true,
@@ -38,26 +45,52 @@ export const initNode2SketchSymbol = (
     console.log(`启动Express服务在 ${baseURL}`);
   });
 
-  return async (selector: (dom) => Element) => {
+  return async (selector?: (dom) => Element) => {
     const browser = await puppeteer.launch({
       headless,
       args: noSandbox
         ? ['--no-sandbox', '--disable-setuid-sandbox']
         : undefined,
     });
+    const page = await browser.newPage();
 
     try {
-      const page = await browser.newPage();
-
-      await page.goto(baseURL + url);
+      const resultURL = `${baseURL}${url}${motions ? '?capture' : ''}`;
+      console.log('访问的网址为:', resultURL);
+      await page.goto(resultURL);
 
       await page.addScriptTag({
         path: resolve(__dirname, '../dist/node2Symbol.bundle.js'),
       });
+      // 添加监听器并完成解析
+      // 同时将结果挂载在 hituSymbolData 上
+      await page.evaluate(`
+        window.addEventListener('message',  function (ev) {
+          if (ev.data.type === 'dumi:capture-element') {
+            const selector = ev.data.value; // => 会获得一个 CSS 选择器
+            console.log(selector);
+            const nodes = document.querySelector(selector);
+            console.log(nodes)
+            window.hituSymbolData = node2Symbol.run(nodes);
+          }
+        });
+      `);
 
-      const json = await page.evaluate(
-        `node2Symbol.run(${selector}(document))`
-      );
+      if (!motions && selector) {
+        const json = await page.evaluate(
+          `node2Symbol.run(${selector}(document))`
+        );
+        if (close) {
+          await browser.close();
+        }
+
+        fs.writeFileSync(filePath + '/index.html', html);
+        return json;
+      }
+
+      await page.waitFor(2000);
+
+      const json = await page.evaluate(`window.hituSymbolData`);
       if (close) {
         await browser.close();
       }

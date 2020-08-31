@@ -1,6 +1,6 @@
 import { nodeToSketchSymbol } from 'html2sketch';
 
-export function run(node = document.body) {
+export function run(node) {
   if (!node) {
     throw Error('没有接收到元素,请检查输入');
   }
