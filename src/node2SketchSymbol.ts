@@ -25,7 +25,7 @@ interface Options {
 export const initNode2SketchSymbol = (
   filePath: string,
   url: string,
-  { headless, close, noSandbox, motions }: Options = {
+  { headless = true, close = true, noSandbox = true, motions }: Options = {
     headless: true,
     close: true,
     noSandbox: true,
