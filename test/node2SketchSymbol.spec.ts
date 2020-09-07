@@ -19,7 +19,7 @@ describe('node2SketchSymbol', function() {
     const node2SketchSymbol = initNode2SketchSymbol(
       resolve(__dirname, './html/motions'),
       '/~demos/02af570d',
-      { headless: false, motions: true }
+      { headless: false }
     );
     const json = await node2SketchSymbol();
     writeFileSync(resolve(__dirname, './motions.json'), JSON.stringify(json));

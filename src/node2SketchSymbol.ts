@@ -94,7 +94,7 @@ export const initNode2SketchSymbol = (
 
       if (selector) {
         const json = await page.evaluate(
-          `node2Symbol.run(${selector}(document))`
+          `node2Symbol.run(${selector}(document)).then(symbol=>symbol)`
         );
 
         if (close) {
