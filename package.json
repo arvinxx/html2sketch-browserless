@@ -36,7 +36,7 @@
   ],
   "dependencies": {
     "express": "^4.17.1",
-    "html2sketch": "^0.3.0",
+    "html2sketch": "^0.3.1",
     "puppeteer": "^5.2.1"
   }
 }
