@@ -17,8 +17,8 @@ describe('node2SketchSymbol', function() {
 
   test('motions', async () => {
     const node2SketchSymbol = initNode2SketchSymbol(
-      resolve(__dirname, './html/motions'),
-      '/~demos/02af570d',
+      resolve(__dirname, './html/techui'),
+      '/~demos/56920700',
       { headless: false }
     );
     const json = await node2SketchSymbol();

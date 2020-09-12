@@ -6,4 +6,7 @@ module.exports = {
     filename: 'node2Symbol.bundle.js',
     library: 'node2Symbol',
   },
+  node: {
+    fs: 'empty',
+  },
 };
