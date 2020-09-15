@@ -52,7 +52,7 @@ export const initNode2SketchSymbol = (
     const browser = await puppeteer.launch({
       headless,
       args: noSandbox
-        ? ['--no-sandbox', '--disable-setuid-sandbox', '-–disable-web-security']
+        ? ['--no-sandbox', '--disable-setuid-sandbox', '--disable-web-security']
         : undefined,
     });
     const page = await browser.newPage();
