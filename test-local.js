@@ -3,7 +3,7 @@ const { resolve } = require('path');
 const { writeFileSync } = require('fs');
 
 const htmlPath = resolve(__dirname, './test/html/techui');
-const node2SketchSymbol = initNode2SketchSymbol(htmlPath, '/~demos/56920700', {
+const node2SketchSymbol = initNode2SketchSymbol(htmlPath, '/~demos/adf32d33', {
   headless: false,
   close: false,
 });
