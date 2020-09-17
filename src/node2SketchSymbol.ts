@@ -20,14 +20,16 @@ interface Options {
   headless?: boolean;
   close?: boolean;
   noSandbox?: boolean;
+  width?: number;
 }
 export const initNode2SketchSymbol = (
   filePath: string,
   url: string,
-  { headless = true, close = true, noSandbox = true }: Options = {
+  { headless = true, close = true, noSandbox = true, width = 1184 }: Options = {
     headless: true,
     close: true,
     noSandbox: true,
+    width: 1184,
   }
 ) => {
   const app = express();
@@ -56,6 +58,8 @@ export const initNode2SketchSymbol = (
         : undefined,
     });
     const page = await browser.newPage();
+
+    await page.setViewport({ height: 900, width });
 
     try {
       const resultURL = `${baseURL}${url}`;
