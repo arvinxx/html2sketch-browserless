@@ -61,6 +61,36 @@ export const initNode2SketchSymbol = (
 
     await page.setViewport({ height: 900, width });
 
+    const handleJSON = async (json) => {
+      const imageList = [];
+      let index: string = '';
+
+      const findImageIndex = (layer) => {
+        if (layer.layers && layer.layers.length > 0) {
+          return layer.layers.forEach((l, j) => {
+            index += '.' + j.toString(); // 定位到相应的位置
+            findImageIndex(l);
+            index = index.slice(0, index.length - 1 - j.toString().length); // 处理完毕后删除
+          });
+        }
+
+        if (layer._class === 'bitmap') {
+          imageList.push(index);
+        }
+      };
+      // @ts-ignore
+      json?.layers.forEach((layer, i) => {
+        index = i.toString();
+        findImageIndex(layer);
+      });
+
+      if (close) {
+        await browser.close();
+      }
+      fs.writeFileSync(filePath + '/index.html', html);
+      return { imageList, data: json };
+    };
+
     try {
       const resultURL = `${baseURL}${url}`;
       console.log('访问的网址为:', resultURL);
@@ -89,32 +119,18 @@ export const initNode2SketchSymbol = (
 
         const json = await page.evaluate(`window.hituSymbolData`);
 
-        if (close) {
-          await browser.close();
-        }
-        fs.writeFileSync(filePath + '/index.html', html);
-        return json;
+        return await handleJSON(json);
       }
 
       if (selector) {
         const json = await page.evaluate(
           `node2Symbol.run(${selector}(document)).then(symbol=>symbol)`
         );
-
-        if (close) {
-          await browser.close();
-        }
-        fs.writeFileSync(filePath + '/index.html', html);
-        return json;
+        return await handleJSON(json);
       }
 
       const json = await page.evaluate(`node2Symbol.run()`);
-
-      if (close) {
-        await browser.close();
-      }
-      fs.writeFileSync(filePath + '/index.html', html);
-      return json;
+      return await handleJSON(json);
     } catch (e) {
       if (close) {
         await browser.close();

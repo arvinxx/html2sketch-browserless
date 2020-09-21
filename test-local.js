@@ -3,10 +3,14 @@ const { resolve } = require('path');
 const { writeFileSync } = require('fs');
 
 const htmlPath = resolve(__dirname, './test/html/techui');
-const node2SketchSymbol = initNode2SketchSymbol(htmlPath, '/~demos/3709d632', {
-  headless: false,
-  close: false,
-});
+const node2SketchSymbol = initNode2SketchSymbol(
+  htmlPath,
+  '/~demos/StatisticCard',
+  {
+    // headless: false,
+    close: false,
+  }
+);
 
 function selector(dom) {
   return dom.getElementById('root-slave');
