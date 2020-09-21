@@ -19,7 +19,7 @@ function selector(dom) {
 node2SketchSymbol(selector).then((json) => {
   if (json) {
     console.log('解析完成成功输出...');
-    writeFileSync(resolve(__dirname, './motions.json'), JSON.stringify(json));
+    writeFileSync(resolve(__dirname, './image.json'), JSON.stringify(json));
   }
   console.log(json);
 });

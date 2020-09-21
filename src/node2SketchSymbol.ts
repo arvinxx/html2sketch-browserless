@@ -68,19 +68,20 @@ export const initNode2SketchSymbol = (
       const findImageIndex = (layer) => {
         if (layer.layers && layer.layers.length > 0) {
           return layer.layers.forEach((l, j) => {
-            index += '.' + j.toString(); // 定位到相应的位置
+            const newIndex = `.layers[${j.toString()}]`;
+            index += newIndex; // 定位到相应的位置
             findImageIndex(l);
-            index = index.slice(0, index.length - 1 - j.toString().length); // 处理完毕后删除
+            index = index.slice(0, index.length - newIndex.length); // 处理完毕后删除
           });
         }
 
         if (layer._class === 'bitmap') {
-          imageList.push(index);
+          imageList.push(index + '.image');
         }
       };
       // @ts-ignore
       json?.layers.forEach((layer, i) => {
-        index = i.toString();
+        index = `layers[${i.toString()}]`;
         findImageIndex(layer);
       });
 
