@@ -1,14 +1,6 @@
 import puppeteer from 'puppeteer';
-import express from 'express';
 import { resolve } from 'path';
-import fs from 'fs';
-
-const hostname = '127.0.0.1'; //IP地址
-
-// const port = (Math.random() * 10000).toFixed(0); //端口号
-const port = 6783; //端口号
-
-const baseURL = `http://${hostname}:${port}`;
+import setupHttpServer from './setupHttpServer';
 
 declare global {
   interface Window {
@@ -21,34 +13,31 @@ interface Options {
   close?: boolean;
   noSandbox?: boolean;
   width?: number;
+  port?: number;
+  hostname?: string;
 }
+// 初始化 node2sketch 服务
 export const initNode2SketchSymbol = (
   filePath: string,
   url: string,
-  { headless = true, close = true, noSandbox = true, width = 1184 }: Options = {
+  {
+    headless = true,
+    close = true,
+    noSandbox = true,
+    width = 1184,
+    port = 6783,
+    hostname = 'localhost',
+  }: Options = {
     headless: true,
     close: true,
     noSandbox: true,
     width: 1184,
+    port: 6783,
+    hostname: 'localhost',
   }
 ) => {
-  const app = express();
-  const html = fs.readFileSync(filePath + '/index.html', 'utf8');
-
-  let temp = html.replace('href="/umi', 'href="umi');
-  temp = temp.replace('src="/umi', 'src="umi');
-
-  fs.writeFileSync(filePath + '/index.html', temp);
-
-  const staticURL = url.split('?')[0];
-
-  const motions = url.split('?')[1]?.includes('capture');
-
-  app.use(staticURL, express.static(filePath)); //指定静态文件目录
-
-  app.listen(port, hostname, () => {
-    console.log(`启动Express服务在 ${baseURL}`);
-  });
+  // 启动 HTTP 服务器并拿到基础 url
+  const { baseURL } = setupHttpServer(filePath, port, hostname);
 
   return async (selector?: (dom) => Element) => {
     const browser = await puppeteer.launch({
@@ -88,13 +77,14 @@ export const initNode2SketchSymbol = (
       if (close) {
         await browser.close();
       }
-      fs.writeFileSync(filePath + '/index.html', html);
       return { imageList, data: json };
     };
 
     try {
       const resultURL = `${baseURL}${url}`;
-      console.log('访问的网址为:', resultURL);
+
+      const motions = url.split('?')[1]?.includes('capture');
+
       await page.goto(resultURL);
 
       await page.addScriptTag({
@@ -123,6 +113,7 @@ export const initNode2SketchSymbol = (
         return await handleJSON(json);
       }
 
+      // 外部指定选择器
       if (selector) {
         const json = await page.evaluate(
           `node2Symbol.run(${selector}(document)).then(symbol=>symbol)`
