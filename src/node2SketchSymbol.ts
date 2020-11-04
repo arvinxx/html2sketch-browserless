@@ -104,6 +104,8 @@ export const initNode2SketchSymbol = (
         });
       `);
 
+      await page.waitFor(5000);
+
       // 如果有 motions
       if (motions) {
         await page.waitFor(1000);
