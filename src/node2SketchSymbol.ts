@@ -1,58 +1,132 @@
 import puppeteer from 'puppeteer';
-import express from 'express';
 import { resolve } from 'path';
-import fs from 'fs';
+import setupHttpServer from './setupHttpServer';
 
-const hostname = '127.0.0.1'; //IP地址
-
-// const port = (Math.random() * 10000).toFixed(0); //端口号
-const port = 6783; //端口号
-
-const baseURL = `http://${hostname}:${port}`;
+declare global {
+  interface Window {
+    hituSelectedNodes: Element[];
+  }
+}
 
 interface Options {
-  headless: boolean;
+  headless?: boolean;
+  close?: boolean;
+  noSandbox?: boolean;
+  width?: number;
+  port?: number;
+  hostname?: string;
 }
+// 初始化 node2sketch 服务
 export const initNode2SketchSymbol = (
   filePath: string,
   url: string,
-  { headless }: Options = { headless: true }
+  {
+    headless = true,
+    close = true,
+    noSandbox = true,
+    width = 1184,
+    port = 6783,
+    hostname = 'localhost',
+  }: Options = {
+    headless: true,
+    close: true,
+    noSandbox: true,
+    width: 1184,
+    port: 6783,
+    hostname: 'localhost',
+  }
 ) => {
-  const app = express();
-  const html = fs.readFileSync(filePath + '/index.html', 'utf8');
+  // 启动 HTTP 服务器并拿到基础 url
+  const { baseURL } = setupHttpServer(filePath, port, hostname);
 
-  let temp = html.replace('href="/umi', 'href="umi');
-  temp = temp.replace('src="/umi', 'src="umi');
+  return async (selector?: (dom) => Element) => {
+    const browser = await puppeteer.launch({
+      headless,
+      args: noSandbox
+        ? ['--no-sandbox', '--disable-setuid-sandbox', '--disable-web-security']
+        : undefined,
+    });
+    const page = await browser.newPage();
 
-  fs.writeFileSync(filePath + '/index.html', temp);
+    await page.setViewport({ height: 900, width });
 
-  app.use(url, express.static(filePath)); //指定静态文件目录
+    const handleJSON = async (json) => {
+      const imageList = [];
+      let index: string = '';
 
-  app.listen(port, hostname, () => {
-    console.log(`启动Express服务在 ${baseURL}`);
-  });
+      const findImageIndex = (layer) => {
+        if (layer.layers && layer.layers.length > 0) {
+          return layer.layers.forEach((l, j) => {
+            const newIndex = `.layers[${j.toString()}]`;
+            index += newIndex; // 定位到相应的位置
+            findImageIndex(l);
+            index = index.slice(0, index.length - newIndex.length); // 处理完毕后删除
+          });
+        }
 
-  return async (selector: (dom) => Element) => {
-    const browser = await puppeteer.launch({ headless });
-
-    try {
-      const page = await browser.newPage();
-
-      await page.goto(baseURL + url);
-
-      await page.addScriptTag({
-        path: resolve(__dirname, '../resources/node2Symbol.bundle.js'),
+        if (layer._class === 'bitmap') {
+          imageList.push(index + '.image');
+        }
+      };
+      // @ts-ignore
+      json?.layers.forEach((layer, i) => {
+        index = `layers[${i.toString()}]`;
+        findImageIndex(layer);
       });
 
-      const json = await page.evaluate(
-        `node2Symbol.run(${selector}(document))`
-      );
-      await browser.close();
+      if (close) {
+        await browser.close();
+      }
+      return { imageList, data: json };
+    };
 
-      fs.writeFileSync(filePath + '/index.html', html);
-      return json;
+    try {
+      const resultURL = `${baseURL}${url}`;
+
+      const motions = url.split('?')[1]?.includes('capture');
+
+      await page.goto(resultURL);
+
+      await page.addScriptTag({
+        path: resolve(__dirname, '../dist/node2Symbol.bundle.js'),
+      });
+      // 添加监听器并完成解析
+      // 同时将结果挂载在 hituSymbolData 上
+      await page.evaluate(`
+        window.addEventListener('message',  function (ev) {
+          if (ev.data.type === 'dumi:capture-element') {
+            const selector = ev.data.value; // => 会获得一个 CSS 选择器
+            console.log(selector);
+            const nodes = document.querySelector(selector);
+            console.log(nodes)
+            window.hituSymbolData = node2Symbol.run(nodes);
+          }
+        });
+      `);
+
+      // 如果有 motions
+      if (motions) {
+        await page.waitFor(1000);
+
+        const json = await page.evaluate(`window.hituSymbolData`);
+
+        return await handleJSON(json);
+      }
+
+      // 外部指定选择器
+      if (selector) {
+        const json = await page.evaluate(
+          `node2Symbol.run(${selector}(document)).then(symbol=>symbol)`
+        );
+        return await handleJSON(json);
+      }
+
+      const json = await page.evaluate(`node2Symbol.run()`);
+      return await handleJSON(json);
     } catch (e) {
-      // await browser.close();
+      if (close) {
+        await browser.close();
+      }
       throw e;
     }
   };

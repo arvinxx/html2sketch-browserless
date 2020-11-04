@@ -1,11 +1,16 @@
 {
   "name": "html2sketch-browserless",
-  "version": "0.1.2",
+  "version": "0.5.4",
   "description": "Convert any website into sketch json",
   "scripts": {
+    "dev": "npm run prebuild && tsc --watch",
+    "build": "tsc",
+    "---------": "",
+    "publish": "npm publish",
+    "publish:next": "npm publish --tag next",
+    "--------- ": "",
     "prebuild": "webpack",
-    "build": "tsc -p tsconfig.json",
-    "release": "npm run build && npm publish"
+    "prepublishOnly": "npm run build && np --no-cleanup --yolo --no-publish --any-branch"
   },
   "main": "./lib/index.js",
   "repository": "https://github.com/arvinxx/html2sketch-browserless.git",
@@ -20,19 +25,25 @@
     "@types/puppeteer": "^3.0.1",
     "jest": "^24.8.0",
     "lint-staged": "^10.0.7",
+    "np": "^6.5.0",
     "prettier": "^1.18.2",
     "ts-jest": "^24.0.2",
-    "ts-loader": "^8.0.2",
     "tslint": "^5.18.0",
     "tslint-config-prettier": "^1.18.0",
     "typescript": "^3.9.6",
     "webpack": "^4.28.3",
     "webpack-cli": "^3.2.0"
   },
-  "files": ["lib",    "resources"],
+  "files": [
+    "lib",
+    "dist"
+  ],
   "dependencies": {
     "express": "^4.17.1",
-    "html2sketch": "^0.1.8",
+    "html2sketch": "0.4.5-0",
     "puppeteer": "^5.2.1"
+  },
+  "publishConfig": {
+    "registry": "https://registry.npmjs.org"
   }
 }

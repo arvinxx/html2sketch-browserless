@@ -19,3 +19,5 @@ src/resources/.umi-production
 /Resources
 .umi
 /src/resources/.umi/
+/test/html/*
+*lock
