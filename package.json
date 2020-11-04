@@ -28,6 +28,7 @@
     "np": "^6.5.0",
     "prettier": "^1.18.2",
     "ts-jest": "^24.0.2",
+    "ts-loader": "^8.0.8",
     "tslint": "^5.18.0",
     "tslint-config-prettier": "^1.18.0",
     "typescript": "^3.9.6",
@@ -40,7 +41,7 @@
   ],
   "dependencies": {
     "express": "^4.17.1",
-    "html2sketch": "0.4.5-0",
+    "html2sketch": "0.4.6",
     "puppeteer": "^5.2.1"
   },
   "publishConfig": {
