@@ -1,6 +1,6 @@
 {
   "name": "html2sketch-browserless",
-  "version": "0.5.5",
+  "version": "0.5.6",
   "description": "Convert any website into sketch json",
   "scripts": {
     "dev": "npm run prebuild && tsc --watch",
