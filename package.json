@@ -1,6 +1,6 @@
 {
   "name": "html2sketch-browserless",
-  "version": "0.5.4",
+  "version": "0.5.5",
   "description": "Convert any website into sketch json",
   "scripts": {
     "dev": "npm run prebuild && tsc --watch",
@@ -28,6 +28,7 @@
     "np": "^6.5.0",
     "prettier": "^1.18.2",
     "ts-jest": "^24.0.2",
+    "ts-loader": "^8.0.8",
     "tslint": "^5.18.0",
     "tslint-config-prettier": "^1.18.0",
     "typescript": "^3.9.6",
